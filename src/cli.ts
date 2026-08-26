@@ -8,8 +8,8 @@ import { report } from "./reporter.js";
 const program = new Command();
 
 program
-  .name("redis-pattern-profiler")
-  .description("Scan Redis keyspace and aggregate MEMORY USAGE by key pattern")
+  .name("llm-cache-inspector")
+  .description("Scan Redis keyspace and aggregate MEMORY USAGE by LLM cache key pattern")
   .argument("[redis-url]", "Redis connection URL", "redis://localhost:6379")
   .option("--prefix <string>", "scan only keys with this prefix")
   .option("--sample-rate <number>", "probabilistic sampling fraction (0-1)", "1.0")
