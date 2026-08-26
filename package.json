@@ -1,9 +1,9 @@
 {
-  "name": "redis-pattern-profiler",
+  "name": "llm-cache-inspector",
   "version": "0.1.0",
-  "description": "Scan a Redis keyspace, infer key patterns, and aggregate MEMORY USAGE per pattern",
+  "description": "Scan a Redis keyspace, infer LLM cache key patterns, and aggregate MEMORY USAGE per pattern",
   "bin": {
-    "redis-pattern-profiler": "./dist/cli.js"
+    "llm-cache-inspector": "./dist/cli.js"
   },
   "main": "./dist/cli.js",
   "scripts": {
