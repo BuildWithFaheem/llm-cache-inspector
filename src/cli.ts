@@ -1,15 +1,20 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Command } from "commander";
 import { createClient } from "./redis.js";
 import { scan } from "./scanner.js";
 import { profile } from "./profiler.js";
 import { report } from "./reporter.js";
 
+const pkg = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf-8"));
+
 const program = new Command();
 
 program
   .name("llm-cache-inspector")
   .description("Scan Redis keyspace and aggregate MEMORY USAGE by LLM cache key pattern")
+  .version(pkg.version)
   .argument("[redis-url]", "Redis connection URL", "redis://localhost:6379")
   .option("--prefix <string>", "scan only keys with this prefix")
   .option("--sample-rate <number>", "probabilistic sampling fraction (0-1)", "1.0")
@@ -17,18 +22,36 @@ program
   .option("--sort <bytes|count>", "sort column", "bytes")
   .option("--json", "emit JSON instead of table")
   .action(async (redisUrl: string, opts) => {
+    const sampleRate = parseFloat(opts.sampleRate);
+    if (Number.isNaN(sampleRate) || sampleRate < 0 || sampleRate > 1) {
+      console.error(`Invalid --sample-rate "${opts.sampleRate}": must be a number between 0 and 1`);
+      process.exit(1);
+    }
+
+    const top = parseInt(opts.top, 10);
+    if (Number.isNaN(top) || top < 1) {
+      console.error(`Invalid --top "${opts.top}": must be a positive integer`);
+      process.exit(1);
+    }
+
+    const sort = opts.sort as "bytes" | "count";
+    if (sort !== "bytes" && sort !== "count") {
+      console.error(`Invalid --sort "${opts.sort}": must be "bytes" or "count"`);
+      process.exit(1);
+    }
+
+    // Redacts "user:pass@" (with or without a scheme, matching what ioredis itself
+    // accepts) so credentials never reach stderr on a connection failure.
+    const safeUrl = redisUrl.replace(/[^\s/@]+@/, "***@");
+
     const client = createClient(redisUrl);
 
     try {
       await client.ping();
     } catch (err) {
-      console.error(`Failed to connect to Redis at ${redisUrl}:`, (err as Error).message);
+      console.error(`Failed to connect to Redis at ${safeUrl}:`, (err as Error).message);
       process.exit(1);
     }
-
-    const sampleRate = parseFloat(opts.sampleRate);
-    const top = parseInt(opts.top, 10);
-    const sort = opts.sort as "bytes" | "count";
 
     const keyBatches = scan(client, {
       prefix: opts.prefix,
