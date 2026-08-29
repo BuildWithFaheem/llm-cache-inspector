@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- CLI entry point (`redis-pattern-profiler`) with `commander`; accepts a Redis URL positional argument defaulting to `redis://localhost:6379`.
+- CLI entry point (`llm-cache-inspector`) with `commander`; accepts a Redis URL positional argument defaulting to `redis://localhost:6379`.
 - `--prefix` flag to restrict the `SCAN` to keys with a given prefix.
 - `--sample-rate` flag (0–1) for probabilistic sampling; keys are filtered per-batch using `Math.random()`.
 - `--top` flag to limit output to the N highest-ranked patterns (default 20).

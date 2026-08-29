@@ -1,4 +1,4 @@
-# redis-pattern-profiler
+# llm-cache-inspector
 
 A CLI tool that scans a Redis keyspace, infers key patterns, and reports memory usage per pattern. It's aimed at AI engineers who cache LLM prompts or responses in Redis and need to verify that their cache key structure is actually working—before a misplaced dynamic segment quietly kills every cache hit and inflates their monthly bill.
 
@@ -7,13 +7,13 @@ A CLI tool that scans a Redis keyspace, infers key patterns, and reports memory 
 ## Install
 
 ```bash
-npm install -g redis-pattern-profiler
+npm install -g llm-cache-inspector
 ```
 
 Or run without installing:
 
 ```bash
-npx redis-pattern-profiler
+npx llm-cache-inspector
 ```
 
 ## Quick start
@@ -21,7 +21,7 @@ npx redis-pattern-profiler
 Point it at your Redis instance:
 
 ```bash
-npx redis-pattern-profiler redis://localhost:6379
+npx llm-cache-inspector redis://localhost:6379
 ```
 
 Output:
@@ -48,22 +48,22 @@ This tool gives you a concrete view of your Redis keyspace organized by pattern 
 
 ```bash
 # Scan the default local Redis
-npx redis-pattern-profiler
+npx llm-cache-inspector
 
 # Remote instance
-npx redis-pattern-profiler redis://user:pass@cache.example.com:6379
+npx llm-cache-inspector redis://user:pass@cache.example.com:6379
 
 # Only look at LLM cache keys
-npx redis-pattern-profiler --prefix llm:cache:
+npx llm-cache-inspector --prefix llm:cache:
 
 # Sample 10% of keys on a large keyspace (faster, still representative)
-npx redis-pattern-profiler --sample-rate 0.1
+npx llm-cache-inspector --sample-rate 0.1
 
 # Show the top 10 patterns sorted by key count instead of bytes
-npx redis-pattern-profiler --top 10 --sort count
+npx llm-cache-inspector --top 10 --sort count
 
 # Emit JSON for piping into jq or another tool
-npx redis-pattern-profiler --json | jq '.[] | select(.count > 100)'
+npx llm-cache-inspector --json | jq '.[] | select(.count > 100)'
 ```
 
 ### Flags
