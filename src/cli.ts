@@ -40,15 +40,9 @@ program
       process.exit(1);
     }
 
-    let safeUrl = redisUrl;
-    try {
-      const parsed = new URL(redisUrl);
-      if (parsed.password) parsed.password = "***";
-      if (parsed.username) parsed.username = "***";
-      safeUrl = parsed.toString();
-    } catch {
-      // not a valid URL; fall through and use it as-is
-    }
+    // Redacts "user:pass@" (with or without a scheme, matching what ioredis itself
+    // accepts) so credentials never reach stderr on a connection failure.
+    const safeUrl = redisUrl.replace(/[^\s/@]+@/, "***@");
 
     const client = createClient(redisUrl);
 

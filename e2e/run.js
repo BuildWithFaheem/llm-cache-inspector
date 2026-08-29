@@ -211,6 +211,13 @@ async function main() {
     if (result.stderr.includes('secretpass')) fail('Error output leaked the Redis password');
   }
 
+  // --- Scenario: credentials redacted even without a scheme (ioredis accepts this form too) ---
+  {
+    const result = run(['baduser:secretpass@127.0.0.1:1']);
+    if (result.status === 0) fail('Connection to an unreachable schemeless Redis URL should exit non-zero');
+    if (result.stderr.includes('secretpass')) fail('Error output leaked the Redis password for a schemeless URL');
+  }
+
   // --- Scenario: large keyspace spans multiple SCAN batches (default batch size 200) ---
   {
     const bulk = client.pipeline();
